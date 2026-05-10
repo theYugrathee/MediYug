@@ -19,6 +19,7 @@ function ProcessingContent() {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isBusy, setIsBusy] = useState(false);
   const [statusText, setStatusText] = useState("Processing medical intake...");
 
   useEffect(() => {
@@ -63,6 +64,10 @@ function ProcessingContent() {
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
+          if (errData.error === "SERVICE_BUSY") {
+            setIsBusy(true);
+            throw new Error("Our AI service is currently at peak capacity due to high demand. Please try again in a few moments.");
+          }
           throw new Error(errData.error || "The AI is currently under high demand. Please try again later.");
         }
 
@@ -91,11 +96,34 @@ function ProcessingContent() {
           <div style={{ width: "80px", height: "80px", background: "rgba(239, 68, 68, 0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 32px" }}>
             <AlertCircle size={40} color="#EF4444" />
           </div>
-          <h2 style={{ color: "var(--primary)", fontSize: "28px", marginBottom: "16px" }}>Processing Encountered an Error</h2>
+          <h2 style={{ color: "var(--primary)", fontSize: "28px", marginBottom: "16px" }}>
+            {isBusy ? "Service is Busy" : "Processing Error"}
+          </h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "16px", marginBottom: "40px", lineHeight: "1.6" }}>{error}</p>
-          <button className="btn-primary" onClick={() => router.push("/intake")} style={{ width: "100%", justifyContent: "center", padding: "16px" }}>
-            Return to Intake Form
-          </button>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {isBusy && (
+              <button 
+                className="btn-primary" 
+                onClick={() => {
+                  setError(null);
+                  setIsBusy(false);
+                  setProgress(10);
+                  runProcess();
+                }} 
+                style={{ width: "100%", justifyContent: "center", padding: "16px" }}
+              >
+                Try Again Now
+              </button>
+            )}
+            <button 
+              className="btn-outline" 
+              onClick={() => router.push("/intake")} 
+              style={{ width: "100%", justifyContent: "center", padding: "16px" }}
+            >
+              Return to Intake Form
+            </button>
+          </div>
         </div>
       ) : (
         <div style={{ maxWidth: "640px", width: "100%", textAlign: "center" }}>

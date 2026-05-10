@@ -69,8 +69,17 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, reportId });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Process API error:", err);
+    
+    // Check if it's a rate limit error (Gemini returns 429)
+    if (err?.status === 429 || String(err).includes("429") || String(err).includes("quota")) {
+      return NextResponse.json(
+        { error: "SERVICE_BUSY", message: "Our AI service is currently at peak capacity." }, 
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
