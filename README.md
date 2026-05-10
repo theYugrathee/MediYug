@@ -1,68 +1,56 @@
 # MediTrip 🏥🌍
 
-MediTrip is an AI-powered medical tourism platform that helps patients find the best and most affordable hospitals worldwide for their specific medical condition.
+MediTrip is a premium, AI-powered medical tourism platform designed to help patients navigate the complex world of global healthcare. We empower users to find world-class, affordable medical treatments by analyzing their specific conditions and cross-referencing them with a global database of accredited hospitals.
 
-Built with **Next.js 14**, **Tailwind CSS**, **Supabase**, **Stripe**, **Claude AI**, and **Google Maps API**.
+Built with **Next.js**, **Supabase**, **Dodo Payments**, and **Advanced AI Analysis**.
 
-## Features
+## ✨ Features
 
-- **AI Medical Condition Analysis:** Uses Claude AI to understand natural language conditions and recommend specialties and procedures.
-- **Global Hospital Search:** Connects to Google Maps Places API to find highly rated hospitals.
-- **Cost Comparisons:** AI-generated estimates of procedure costs across different countries compared to the user's home country.
-- **Paywalled Reports:** Users get top 2 results for free. They can unlock the full report via a one-time Stripe payment or a monthly subscription.
-- **PDF Email Reports:** Full reports are automatically sent to users via email using Resend.
-- **User Dashboard:** Supabase Auth-powered dashboard to track search history and past reports.
+- **AI-Powered Clinical Analysis**: Uses state-of-the-art AI to interpret medical conditions and recommend specific specialties, procedures, and global destinations.
+- **Global Hospital Intelligence**: Integration with global mapping data to identify highly-rated, internationally accredited hospitals.
+- **Cost Transparency**: Provides AI-generated cost estimates for procedures across different countries, helping users save up to 80% compared to local treatments.
+- **Premium Medical Reports**: Users can unlock comprehensive, clinical-grade reports detailing hospital certifications, travel logistics, and personalized healthcare pathways.
+- **Secure Payments**: Fully integrated with Dodo Payments for safe and seamless global transactions.
+- **Personalized Dashboard**: A private user portal to manage search history, track report status, and access past medical insights.
 
-## Prerequisites
+## 🛠️ Tech Stack
 
-- Node.js 18+
-- Supabase Account (Free tier)
-- Anthropic Account for Claude API
-- Google Cloud Console Account for Maps API
-- Stripe Account
-- Resend Account (Free tier)
+- **Framework**: Next.js (App Router)
+- **Styling**: Modern CSS with high-performance animations
+- **Database & Auth**: Supabase (PostgreSQL)
+- **Payment Gateway**: Dodo Payments
+- **AI Engine**: Advanced Large Language Models (LLM)
+- **Emails**: Resend API
+- **Maps Integration**: Google Places API
 
-## Setup Instructions
+## 🚀 Getting Started
 
-### 1. Clone & Install
-\`\`\`bash
-npm install --legacy-peer-deps
-\`\`\`
+### 1. Installation
+```bash
+npm install
+```
 
-### 2. Environment Variables
-Copy the example environment file:
-\`\`\`bash
-cp .env.example .env.local
-\`\`\`
-Fill in all the required API keys in `.env.local`.
+### 2. Environment Setup
+Create a `.env.local` file in the root directory and add the following keys (refer to `.env.example` for the full list):
+- Supabase Project URL & Anon Key
+- AI Service API Keys
+- Dodo Payments Secret Keys
+- Google Maps API Key
+- Resend API Key
 
-### 3. Database Setup (Supabase)
-1. Go to your Supabase project.
-2. Navigate to the SQL Editor.
-3. Open `supabase/schema.sql` from this repository.
-4. Run the entire SQL script to create tables, triggers, and Row Level Security (RLS) policies.
+### 3. Database Initialization
+1. Create a new project in your Supabase Dashboard.
+2. Run the provided SQL script found in `supabase/schema.sql` using the Supabase SQL Editor to set up the necessary tables and relationships.
 
-### 4. Stripe Setup
-1. Create products in your Stripe Dashboard for "One-Time Report" ($19) and "Monthly Unlimited" ($29/month).
-2. Get your Secret Key and Publishable Key.
-3. Configure a Stripe Webhook pointing to `https://your-domain.com/api/payment/webhook` (or use Stripe CLI for local testing).
-4. Webhook events to listen to: `checkout.session.completed` and `payment_intent.succeeded`.
-
-### 5. Run Locally
-\`\`\`bash
+### 4. Running the Development Server
+```bash
 npm run dev
-\`\`\`
-The app will be running at `http://localhost:3000`.
+```
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Architecture Details
+## 🛡️ Disclaimer
 
-- **Frontend:** Next.js App Router, React Server Components where applicable, Tailwind for styling.
-- **Database:** Supabase PostgreSQL.
-- **Authentication:** Supabase Auth (Email/Password + Google OAuth).
-- **Payments:** Stripe Checkout.
-- **AI Integration:** `@anthropic-ai/sdk` using `claude-sonnet-4-20250514`.
-- **Emails:** Resend API.
+MediTrip is an informational platform and does not provide medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health providers with any questions you may have regarding a medical condition. This platform is designed to assist in researching travel and cost options for elective medical procedures.
 
-## Disclaimer
-
-This platform includes a medical disclaimer on all pages. It is designed to provide *informational guidance only* and should not replace professional medical advice.
+---
+*Created with care for global health equity.*
