@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -49,6 +49,29 @@ function IntakeContent() {
     planType: "standard",
   });
 
+  // Restore form from localStorage if it exists (useful after auth redirect)
+  useEffect(() => {
+    const saved = localStorage.getItem("pendingIntakeForm");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setForm(prev => ({ ...prev, ...parsed }));
+        // If we just came back from auth, we might want to auto-submit
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user) {
+            localStorage.removeItem("pendingIntakeForm");
+            // Auto-submit after restore if we are at the last step
+            setStep(4);
+            handleSubmit(parsed as IntakeFormData);
+          }
+        });
+      } catch (e) {
+        console.error("Error restoring form", e);
+      }
+    }
+  }, []);
+
   const progress = ((step - 1) / (STEPS.length - 1)) * 100;
 
   function update<K extends keyof IntakeFormData>(key: K, val: IntakeFormData[K]) {
@@ -67,10 +90,10 @@ function IntakeContent() {
     return true;
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(overrideForm?: IntakeFormData) {
     setLoading(true);
     try {
-      const payload = form as IntakeFormData;
+      const payload = overrideForm || (form as IntakeFormData);
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +119,8 @@ function IntakeContent() {
     if (user) {
       await handleSubmit();
     } else {
+      // Save form to localStorage so it survives the OAuth redirect
+      localStorage.setItem("pendingIntakeForm", JSON.stringify(form));
       setShowAuthGate(true);
     }
   }

@@ -1,13 +1,24 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { IntakeFormData, AIReport } from "@/types";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyPlaceholderForBuild");
+function getGenAI() {
+  const keys = [
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_2,
+    process.env.GEMINI_API_KEY_3,
+    process.env.GEMINI_API_KEY_4,
+    process.env.GEMINI_API_KEY_5
+  ].filter(Boolean);
+  const randomKey = keys[Math.floor(Math.random() * keys.length)] || "AIzaSyPlaceholderForBuild";
+  return new GoogleGenerativeAI(randomKey);
+}
 
 const SYSTEM_PROMPT = `You are MediTrip's medical travel AI assistant. You help patients find the best hospitals worldwide for their condition. You are knowledgeable about global medical tourism, international hospital accreditation (JCI, NABH), treatment costs by country, and medical specializations. Always respond with structured JSON. Never give specific medical advice. Always include disclaimer that users should consult a doctor before traveling. Be accurate, compassionate and trustworthy.
 
 When generating cost estimates, use realistic 2026 market rates. Always include a compassionate tone while being factual about costs and quality.`;
 
 export async function generateMedicalReport(formData: IntakeFormData): Promise<AIReport> {
+  const genAI = getGenAI();
   // The user no longer provides a budget or local quote.
   // The AI must research these costs automatically.
 
