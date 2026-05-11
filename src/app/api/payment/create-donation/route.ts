@@ -35,16 +35,16 @@ export async function POST(req: NextRequest) {
       },
       product_cart: [
         {
-          product_id: "don_generic", // Placeholder or real ID if you have one
+          product_id: process.env.DODO_PRODUCT_ID_DONATION || "pdt_0NechJjqM8IYjxVykT9Hf",
           quantity: 1,
-          amount: amount * 100, // Dodo usually uses cents/smallest unit
+          amount: amount * 100, // Dodo uses cents
         },
       ],
       metadata: {
         type: "donation",
         amount: String(amount),
       },
-      return_url: `${baseUrl}/payment/success?type=donation`,
+      return_url: `${baseUrl}/`, // Redirect donors back to home page
       payment_link: true,
     });
 
