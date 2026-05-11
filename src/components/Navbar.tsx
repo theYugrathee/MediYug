@@ -110,9 +110,11 @@ export default function Navbar() {
             }}
             aria-label="Open menu"
           >
-            <span style={{ display: "block", width: "22px", height: "2px", background: "var(--primary)", borderRadius: "2px" }} />
-            <span style={{ display: "block", width: "22px", height: "2px", background: "var(--primary)", borderRadius: "2px" }} />
-            <span style={{ display: "block", width: "14px", height: "2px", background: "var(--primary)", borderRadius: "2px" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px", pointerEvents: "none" }}>
+              <span style={{ display: "block", width: "22px", height: "2px", background: "var(--primary)", borderRadius: "2px" }} />
+              <span style={{ display: "block", width: "22px", height: "2px", background: "var(--primary)", borderRadius: "2px" }} />
+              <span style={{ display: "block", width: "14px", height: "2px", background: "var(--primary)", borderRadius: "2px" }} />
+            </div>
           </button>
         </div>
       </nav>
@@ -120,15 +122,15 @@ export default function Navbar() {
       {/* Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(10,37,64,0.45)", backdropFilter: "blur(4px)" }}
+          style={{ position: "fixed", inset: 0, zIndex: 1900, background: "rgba(10,37,64,0.45)", backdropFilter: "blur(4px)" }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar Panel — only mounted when open to prevent blocking clicks */}
+      {/* Sidebar Panel */}
       {sidebarOpen && (
       <div style={{
-        position: "fixed", top: 0, right: 0, bottom: 0, width: "min(320px, 85vw)", zIndex: 400,
+        position: "fixed", top: 0, right: 0, bottom: 0, width: "min(320px, 85vw)", zIndex: 2000,
         background: "white", boxShadow: "-8px 0 40px rgba(0,0,0,0.15)",
         display: "flex", flexDirection: "column",
         overflowY: "auto",

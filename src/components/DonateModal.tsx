@@ -73,14 +73,14 @@ export default function DonateModal({ onClose }: DonateModalProps) {
         {/* Amount Grid */}
         <div style={{ 
           display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", 
-          gap: "12px", marginBottom: "32px" 
+          gap: "10px", marginBottom: "16px" 
         }}>
           {DONATION_AMOUNTS.map((amt) => (
             <button
               key={amt}
               onClick={() => setSelectedAmount(amt)}
               style={{
-                padding: "16px 8px", borderRadius: "12px", border: "1.5px solid",
+                padding: "12px 8px", borderRadius: "10px", border: "1.5px solid",
                 borderColor: selectedAmount === amt ? "var(--accent)" : "var(--border)",
                 background: selectedAmount === amt ? "rgba(16,185,129,0.05)" : "white",
                 color: selectedAmount === amt ? "var(--primary)" : "var(--text-primary)",
@@ -88,9 +88,29 @@ export default function DonateModal({ onClose }: DonateModalProps) {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "2px"
               }}
             >
-              <DollarSign size={14} />{amt.toLocaleString()}
+              <DollarSign size={13} />{amt.toLocaleString()}
             </button>
           ))}
+        </div>
+
+        {/* Custom Amount Input */}
+        <div style={{ marginBottom: "32px" }}>
+          <div style={{ position: "relative" }}>
+            <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--text-secondary)", fontWeight: "600" }}>$</span>
+            <input 
+              type="number"
+              placeholder="Other amount"
+              value={selectedAmount || ""}
+              onChange={(e) => setSelectedAmount(Number(e.target.value))}
+              style={{
+                width: "100%", padding: "14px 16px 14px 32px", borderRadius: "12px",
+                border: "1.5px solid var(--border)", fontSize: "16px", fontWeight: "600",
+                outline: "none", transition: "border-color 0.2s", boxSizing: "border-box"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "var(--accent)"}
+              onBlur={(e) => e.target.style.borderColor = "var(--border)"}
+            />
+          </div>
         </div>
 
         {/* Action */}

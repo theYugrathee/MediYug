@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 
@@ -41,53 +41,53 @@ function ProcessingContent() {
     setTimeout(tick, 200);
   }, []);
 
+  const runProcess = useCallback(async () => {
+    if (!searchId) return;
+    try {
+      const storedData = sessionStorage.getItem(`formData_${searchId}`);
+      if (!storedData) {
+        setError("No session data found. Please start over.");
+        return;
+      }
+
+      const formData = JSON.parse(storedData);
+      const res = await fetch("/api/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ searchId, formData }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        if (errData.error === "SERVICE_BUSY") {
+          setIsBusy(true);
+          throw new Error("Our AI service is currently at peak capacity due to high demand. Please try again in a few moments.");
+        }
+        throw new Error(errData.error || "The AI is currently under high demand. Please try again later.");
+      }
+
+      const data = await res.json();
+      if (data.success || data.reportId) {
+        setProgress(100);
+        setStatusText("Report successfully generated.");
+        sessionStorage.removeItem(`formData_${searchId}`);
+        setTimeout(() => {
+          router.push(`/results?searchId=${searchId}`);
+        }, 1000);
+      }
+    } catch (err) {
+      console.error("Processing error:", err);
+      setError(err instanceof Error ? err.message : "Network error. Please check your connection and try again.");
+    }
+  }, [searchId, router]);
+
   useEffect(() => {
     if (!searchId) {
       setError("Reference ID not found. Please try again.");
       return;
     }
-
-    const runProcess = async () => {
-      try {
-        const storedData = sessionStorage.getItem(`formData_${searchId}`);
-        if (!storedData) {
-          setError("No session data found. Please start over.");
-          return;
-        }
-
-        const formData = JSON.parse(storedData);
-        const res = await fetch("/api/process", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ searchId, formData }),
-        });
-
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          if (errData.error === "SERVICE_BUSY") {
-            setIsBusy(true);
-            throw new Error("Our AI service is currently at peak capacity due to high demand. Please try again in a few moments.");
-          }
-          throw new Error(errData.error || "The AI is currently under high demand. Please try again later.");
-        }
-
-        const data = await res.json();
-        if (data.success || data.reportId) {
-          setProgress(100);
-          setStatusText("Report successfully generated.");
-          sessionStorage.removeItem(`formData_${searchId}`);
-          setTimeout(() => {
-            router.push(`/results?searchId=${searchId}`);
-          }, 1000);
-        }
-      } catch (err) {
-        console.error("Processing error:", err);
-        setError(err instanceof Error ? err.message : "Network error. Please check your connection and try again.");
-      }
-    };
-
     runProcess();
-  }, [searchId, router]);
+  }, [searchId, runProcess]);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
