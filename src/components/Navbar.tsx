@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, X, Home, FileText, LogOut, Plus, ChevronRight, User, Zap } from "lucide-react";
+import { Globe, X, Home, FileText, LogOut, Plus, ChevronRight, User, Zap, Heart } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import DonateModal from "./DonateModal";
 
 export default function Navbar() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string } } | null>(null);
   const [regenCount, setRegenCount] = useState<number | null>(null);
+  const [donateOpen, setDonateOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -50,6 +52,7 @@ export default function Navbar() {
 
   return (
     <>
+      {donateOpen && <DonateModal onClose={() => setDonateOpen(false)} />}
       <nav className="navbar" style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)" }}>
         <div className="container-custom" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", width: "100%" }}>
 
@@ -208,6 +211,27 @@ export default function Navbar() {
             );
           })}
 
+          {/* Donation Button */}
+          <button 
+            onClick={() => { setSidebarOpen(false); setDonateOpen(true); }}
+            style={{
+              width: "calc(100% - 24px)", margin: "12px", padding: "14px 16px",
+              background: "rgba(16,185,129,0.06)", border: "1.5px dashed rgba(16,185,129,0.3)",
+              borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center",
+              justifyContent: "space-between", transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(16,185,129,0.12)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(16,185,129,0.06)"}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Heart size={16} color="white" fill="white" />
+              </div>
+              <span style={{ fontWeight: "700", fontSize: "15px", color: "var(--primary)" }}>Support Our Mission</span>
+            </div>
+            <ArrowRight size={16} color="var(--accent)" />
+          </button>
+
           {/* Upgrade banner if no regenerations */}
           {user && regenCount === 0 && (
             <Link href="/intake" onClick={() => setSidebarOpen(false)} style={{ textDecoration: "none" }}>
@@ -247,5 +271,17 @@ export default function Navbar() {
       </div>
       )}
     </>
+  );
+}
+
+function ArrowRight({ size, color }: { size: number; color?: string }) {
+  return (
+    <svg 
+      width={size} height={size} viewBox="0 0 24 24" fill="none" 
+      stroke={color || "currentColor"} strokeWidth="2" strokeLinecap="round" 
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
   );
 }
