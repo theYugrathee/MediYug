@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS public.users (
   full_name TEXT,
   reports_remaining INTEGER DEFAULT 0,
   regenerations_remaining INTEGER DEFAULT 0,
-  stripe_customer_id TEXT,
-  stripe_subscription_id TEXT,
+  dodo_customer_id TEXT,
+  dodo_subscription_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

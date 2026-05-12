@@ -75,7 +75,7 @@ function PaymentSuccessContent() {
           <p style={{ color: "#64748B", fontSize: "16px", lineHeight: "1.7", marginBottom: "32px" }}>
             {confirmed 
               ? "Your full MediTrip report has been unlocked. You can now access all hospital matches and clinical findings."
-              : "We are verifying your transaction with Stripe. This usually takes a few seconds."}
+              : "We are verifying your transaction with Dodo. This usually takes a few seconds."}
           </p>
 
           {!confirmed && (

@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
         await supabase
           .from("users")
           .update({ 
-            stripe_subscription_id: (payment.subscription_id as string) || `premium_${payment.payment_id}`, 
-            stripe_customer_id: payment.customer?.customer_id as string 
+            dodo_subscription_id: (payment.subscription_id as string) || `premium_${payment.payment_id}`, 
+            dodo_customer_id: payment.customer?.customer_id as string 
           })
           .eq("id", userId);
       }

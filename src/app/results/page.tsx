@@ -63,7 +63,7 @@ function PaywallModal({ searchId, onClose }: { searchId: string; onClose: () => 
           </button>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {["All hospital matches + contacts", "Clinical cost comparisons", "Direct clinical coordinates", "Secure Stripe payment"].map((f) => (
+          {["All hospital matches + contacts", "Clinical cost comparisons", "Direct clinical coordinates", "Secure Dodo payment"].map((f) => (
             <div key={f} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: "var(--text-secondary)" }}>
               <CheckCircle2 size={14} color="var(--accent)" /> {f}
             </div>

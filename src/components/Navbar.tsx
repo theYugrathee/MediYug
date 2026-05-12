@@ -21,7 +21,7 @@ export default function Navbar() {
         const fetchUserData = async () => {
           try {
             const { data, error } = await supabase.from("users")
-              .select("stripe_subscription_id")
+              .select("dodo_subscription_id")
               .eq("id", u.id)
               .single();
             if (error) {

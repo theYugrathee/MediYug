@@ -239,7 +239,7 @@ function PaymentContent() {
 
                 <div style={{ marginTop: "24px", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "20px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-secondary)", fontWeight: "600" }}>
-                    <ShieldCheck size={14} color="var(--accent)" /> Stripe Protected
+                    <ShieldCheck size={14} color="var(--accent)" /> Dodo Protected
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-secondary)", fontWeight: "600" }}>
                     <Lock size={14} color="var(--accent)" /> 256-bit SSL

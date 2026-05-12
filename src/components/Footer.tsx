@@ -72,7 +72,7 @@ export default function Footer() {
           <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>© {new Date().getFullYear()} MediTrip Global. All rights reserved.</p>
           <div style={{ display: "flex", gap: "24px" }}>
             <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>Powered by AI</span>
-            <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>Stripe Secure</span>
+            <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)" }}>Dodo Secure</span>
           </div>
         </div>
       </div>

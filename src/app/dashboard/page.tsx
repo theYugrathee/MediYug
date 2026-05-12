@@ -22,7 +22,7 @@ interface SearchRecord {
 
 interface UserData {
   reports_remaining: number;
-  stripe_subscription_id?: string;
+  dodo_subscription_id?: string;
 }
 
 function ReportMenu({ search, report, onClose }: {
@@ -86,7 +86,7 @@ export default function DashboardPage() {
 
       const [searchRes, userRes] = await Promise.all([
         supabase.from("searches").select("*, reports(id, is_paid)").eq("user_id", u.id).order("created_at", { ascending: false }).limit(30),
-        supabase.from("users").select("reports_remaining, stripe_subscription_id").eq("id", u.id).single(),
+        supabase.from("users").select("reports_remaining, dodo_subscription_id").eq("id", u.id).single(),
       ]);
 
       setSearches(searchRes.data || []);
