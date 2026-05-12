@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, X, Home, FileText, LogOut, Plus, ChevronRight, User, Zap, Heart } from "lucide-react";
+import { 
+  Globe, Plus, User, FileText, LayoutDashboard, LogOut, X, Home, 
+  Menu, Heart, ChevronRight, ShieldCheck, Info, Mail 
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import DonateModal from "./DonateModal";
 
@@ -90,6 +93,32 @@ export default function Navbar() {
                 </Link>
               </>
             )}
+            {/* Donation Button Desktop */}
+            <button 
+              onClick={() => setDonateOpen(true)}
+              style={{
+                background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)",
+                borderRadius: "10px", padding: "8px 14px", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(16,185,129,0.15)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(16,185,129,0.1)"}
+            >
+              <Heart size={14} color="var(--accent)" fill="var(--accent)" />
+              <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--primary)" }}>Support Mission</span>
+            </button>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Donation Heart Mobile */}
+            <button 
+              className="md:hidden"
+              onClick={() => setDonateOpen(true)}
+              style={{ background: "rgba(16,185,129,0.1)", border: "none", borderRadius: "8px", padding: "8px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+            >
+              <Heart size={16} color="var(--accent)" fill="var(--accent)" />
+              <span style={{ fontSize: "12px", fontWeight: "800", color: "var(--accent)" }}>Donate</span>
+            </button>
           </div>
 
           {/* Hamburger — always visible */}
@@ -180,6 +209,9 @@ export default function Navbar() {
             { href: "/", label: "Home", icon: <Home size={18} /> },
             { href: "/dashboard", label: "My Reports", icon: <FileText size={18} />, authRequired: true },
             { href: "/intake", label: "New Search", icon: <Plus size={18} /> },
+            { href: "/about", label: "About & Founder", icon: <Info size={18} /> },
+            { href: "/legal/terms", label: "Terms & Legal", icon: <ShieldCheck size={18} /> },
+            { href: "mailto:yugrathee28@gmail.com", label: "Contact Us", icon: <Mail size={18} /> },
           ].map((item) => {
             if (item.authRequired && !user) return null;
             return (
@@ -202,26 +234,7 @@ export default function Navbar() {
             );
           })}
 
-          {/* Donation Button */}
-          <button 
-            onClick={() => { setSidebarOpen(false); setDonateOpen(true); }}
-            style={{
-              width: "calc(100% - 24px)", margin: "12px", padding: "14px 16px",
-              background: "rgba(16,185,129,0.06)", border: "1.5px dashed rgba(16,185,129,0.3)",
-              borderRadius: "14px", cursor: "pointer", display: "flex", alignItems: "center",
-              justifyContent: "space-between", transition: "all 0.2s"
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(16,185,129,0.12)"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(16,185,129,0.06)"}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Heart size={16} color="white" fill="white" />
-              </div>
-              <span style={{ fontWeight: "700", fontSize: "15px", color: "var(--primary)" }}>Support Our Mission</span>
-            </div>
-            <ArrowRight size={16} color="var(--accent)" />
-          </button>
+
 
 
         </div>

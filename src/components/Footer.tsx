@@ -26,7 +26,12 @@ export default function Footer() {
           <div>
             <h4 style={{ color: "white", fontWeight: "700", marginBottom: "24px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Platform</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {[{ label: "Find Hospitals", href: "/intake" }, { label: "How It Works", href: "/#how-it-works" }, { label: "Patient Stories", href: "/#how-it-works" }].map((item) => (
+              {[
+                { label: "About Us", href: "/about" },
+                { label: "Founder's Vision", href: "/about" },
+                { label: "How It Works", href: "/#how-it-works" },
+                { label: "Find Hospitals", href: "/intake" }
+              ].map((item) => (
                 <Link key={item.label} href={item.href} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "15px", transition: "all 0.2s" }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}>
@@ -40,11 +45,16 @@ export default function Footer() {
           <div>
             <h4 style={{ color: "white", fontWeight: "700", marginBottom: "24px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Resources</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {["Privacy Policy", "Terms of Service", "Medical Disclaimer", "Contact Support"].map((item) => (
-                <Link key={item} href="#" style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "15px", transition: "all 0.2s" }}
+              {[
+                { label: "Privacy Policy", href: "/legal/terms" },
+                { label: "Terms of Service", href: "/legal/terms" },
+                { label: "Medical Disclaimer", href: "/legal/terms" },
+                { label: "Contact: yugrathee28@gmail.com", href: "mailto:yugrathee28@gmail.com" }
+              ].map((item) => (
+                <Link key={item.label} href={item.href} style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "15px", transition: "all 0.2s" }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}>
-                  {item}
+                  {item.label}
                 </Link>
               ))}
             </div>

@@ -38,21 +38,37 @@ export default function DonateModal({ onClose }: DonateModalProps) {
   }
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 1000,
-      background: "rgba(10,37,64,0.6)", backdropFilter: "blur(8px)",
-      display: "flex", alignItems: "center", justifyContent: "center", padding: "16px"
-    }}>
-      <div className="card animate-fade-in-up" style={{ 
-        maxWidth: "480px", width: "100%", padding: "32px", position: "relative",
-        background: "white", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)"
-      }}>
+    <div 
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(10,37,64,0.6)", backdropFilter: "blur(8px)",
+        display: "flex", alignItems: "center", justifyContent: "center", padding: "16px",
+        cursor: "pointer"
+      }}
+    >
+      <div 
+        className="card animate-fade-in-up" 
+        onClick={(e) => e.stopPropagation()}
+        style={{ 
+          maxWidth: "480px", width: "100%", padding: "32px", position: "relative",
+          background: "white", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+          cursor: "default"
+        }}
+      >
         {/* Close */}
-        <button onClick={onClose} style={{
-          position: "absolute", top: "16px", right: "16px",
-          background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)"
-        }}>
-          <X size={24} />
+        <button 
+          onClick={onClose} 
+          style={{
+            position: "absolute", top: "16px", right: "16px",
+            background: "rgba(0,0,0,0.05)", border: "none", borderRadius: "50%",
+            width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", color: "var(--primary)", transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.1)"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.05)"}
+        >
+          <X size={20} />
         </button>
 
         {/* Header */}
