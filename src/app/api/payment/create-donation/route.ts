@@ -19,32 +19,26 @@ export async function POST(req: NextRequest) {
     const origin = req.headers.get("origin");
     const baseUrl = origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-    // Create a one-time payment for the donation
-    // We use a generic "Donation" product or create one on the fly if supported,
-    // but Dodo usually requires a product ID. 
-    // However, Dodo supports "payments" without a pre-defined product sometimes,
-    // but the safest way is to use the payments.create method.
-    
     const payment = await dodo.payments.create({
       billing: {
-        country: "US", // Default
+        country: "US",
       },
       customer: {
         name: "Anonymous Supporter",
-        email: "support@meditrip.com", // Generic fallback
+        email: "support@meditrip.com",
       },
       product_cart: [
         {
           product_id: process.env.DODO_PRODUCT_ID_DONATION || "pdt_0NechJjqM8IYjxVykT9Hf",
           quantity: 1,
-          amount: amount * 100, // Dodo uses cents
+          amount: amount * 100,
         },
       ],
       metadata: {
         type: "donation",
         amount: String(amount),
       },
-      return_url: `${baseUrl}/`, // Redirect donors back to home page
+      return_url: `${baseUrl}/`,
       payment_link: true,
     });
 
