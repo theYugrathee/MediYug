@@ -11,7 +11,6 @@ export default function Navbar() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string } } | null>(null);
-  const [regenCount, setRegenCount] = useState<number | null>(null);
   const [donateOpen, setDonateOpen] = useState(false);
 
   useEffect(() => {
@@ -22,14 +21,11 @@ export default function Navbar() {
         const fetchUserData = async () => {
           try {
             const { data, error } = await supabase.from("users")
-              .select("regenerations_remaining, stripe_subscription_id")
+              .select("stripe_subscription_id")
               .eq("id", u.id)
               .single();
             if (error) {
               console.error("Navbar data error:", error);
-            } else if (data) {
-              if (data.stripe_subscription_id) setRegenCount(-1);
-              else setRegenCount(data.regenerations_remaining || 0);
             }
           } catch (err) {
             console.error("Navbar data error:", err);
@@ -158,14 +154,7 @@ export default function Navbar() {
                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.55)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</div>
               </div>
             </div>
-            {regenCount !== null && (
-              <div style={{ marginTop: "14px", background: "rgba(255,255,255,0.08)", borderRadius: "10px", padding: "10px 14px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <Zap size={14} color="#10B981" />
-                <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)", fontWeight: "600" }}>
-                  {regenCount === -1 ? "Unlimited regenerations" : `${regenCount} regeneration${regenCount !== 1 ? "s" : ""} left`}
-                </span>
-              </div>
-            )}
+
           </div>
         ) : (
           <div style={{ margin: "20px 20px 0", padding: "20px", background: "#F8FAFC", borderRadius: "16px", border: "1px solid var(--border)" }}>
@@ -234,21 +223,7 @@ export default function Navbar() {
             <ArrowRight size={16} color="var(--accent)" />
           </button>
 
-          {/* Upgrade banner if no regenerations */}
-          {user && regenCount === 0 && (
-            <Link href="/intake" onClick={() => setSidebarOpen(false)} style={{ textDecoration: "none" }}>
-              <div style={{ margin: "8px 4px", padding: "14px 16px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "12px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                  <Zap size={14} color="var(--accent)" />
-                  <span style={{ fontWeight: "700", fontSize: "13px", color: "var(--accent)" }}>No Regenerations Left</span>
-                </div>
-                <p style={{ fontSize: "12px", color: "var(--text-secondary)", margin: "0 0 8px" }}>
-                  Start a new search to get a fresh report.
-                </p>
-                <span style={{ fontSize: "12px", fontWeight: "700", color: "var(--primary)" }}>Start New Search →</span>
-              </div>
-            </Link>
-          )}
+
         </div>
 
         {/* Bottom Sign Out */}

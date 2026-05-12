@@ -21,7 +21,6 @@ interface SearchRecord {
 }
 
 interface UserData {
-  regenerations_remaining: number;
   reports_remaining: number;
   stripe_subscription_id?: string;
 }
@@ -87,7 +86,7 @@ export default function DashboardPage() {
 
       const [searchRes, userRes] = await Promise.all([
         supabase.from("searches").select("*, reports(id, is_paid)").eq("user_id", u.id).order("created_at", { ascending: false }).limit(30),
-        supabase.from("users").select("regenerations_remaining, reports_remaining, stripe_subscription_id").eq("id", u.id).single(),
+        supabase.from("users").select("reports_remaining, stripe_subscription_id").eq("id", u.id).single(),
       ]);
 
       setSearches(searchRes.data || []);
@@ -116,7 +115,7 @@ export default function DashboardPage() {
 
   const name = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
   const paidCount = searches.filter((s) => s.reports?.some((r) => r.is_paid)).length;
-  const regenLeft: number | "unlimited" = userData?.stripe_subscription_id ? "unlimited" : (userData?.regenerations_remaining || 0);
+
 
   if (loading) {
     return (

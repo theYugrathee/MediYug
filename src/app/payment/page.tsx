@@ -13,7 +13,7 @@ const PLANS = [
     price: "$19",
     priceNum: 19,
     billing: "one-time",
-    description: "1 full report + 2 regenerations to refine your search",
+    description: "Full clinical report with verified hospital matches",
     features: [
       "All hospital matches unlocked",
       "Full cost breakdown",
