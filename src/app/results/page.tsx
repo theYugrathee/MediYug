@@ -20,7 +20,8 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-function PaywallModal({ searchId, onClose }: { searchId: string; onClose: () => void }) {
+function PaywallModal({ searchId, report, onClose }: { searchId: string; report: Report; onClose: () => void }) {
+  const lockedHospitals = report.hospitals.slice(2);
   const router = useRouter();
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(10,37,64,0.4)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }} onClick={onClose}>
@@ -30,11 +31,13 @@ function PaywallModal({ searchId, onClose }: { searchId: string; onClose: () => 
           <div style={{ width: "64px", height: "64px", background: "rgba(16,185,129,0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
             <Lock size={32} color="var(--accent)" />
           </div>
-          <h2 style={{ fontSize: "28px", color: "var(--primary)", marginBottom: "12px" }}>Unlock Full Report</h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "15px", lineHeight: "1.6", marginBottom: "16px" }}>Get all hospital matches, cost breakdowns, and direct coordinates to finalize your medical travel.</p>
+          <h2 style={{ fontSize: "28px", color: "var(--primary)", marginBottom: "12px" }}>Stop Overpaying for Care</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "15px", lineHeight: "1.6", marginBottom: "16px" }}>
+            Our database shows <strong>{lockedHospitals.length} more hospitals</strong> in {report.aiReport.topCountries[0]?.country} that could be <strong>up to 40% more affordable</strong> than your current results.
+          </p>
           <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "12px", padding: "12px 16px", marginBottom: "20px" }}>
             <p style={{ margin: 0, fontSize: "14px", fontWeight: "700", color: "var(--accent)" }}>
-              💰 People save an average of $31,000 using MediTrip.
+              ⚡ Pro Tip: The most affordable clinical match is currently hidden. Unlock now to see it.
             </p>
           </div>
         </div>
@@ -46,7 +49,10 @@ function PaywallModal({ searchId, onClose }: { searchId: string; onClose: () => 
                 <div style={{ fontWeight: "700", fontSize: "15px", color: "var(--primary)" }}>Standard Report</div>
                 <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "2px" }}>All hospitals + contact details</div>
               </div>
-              <div style={{ fontSize: "20px", fontWeight: "800", color: "var(--primary)" }}>$19</div>
+              <div style={{ textAlign: "right" }}>
+                <span style={{ fontSize: "14px", textDecoration: "line-through", color: "rgba(0,0,0,0.3)", marginRight: "8px" }}>$49</span>
+                <div style={{ fontSize: "20px", fontWeight: "800", color: "var(--primary)" }}>$19</div>
+              </div>
             </div>
           </button>
 
@@ -58,7 +64,10 @@ function PaywallModal({ searchId, onClose }: { searchId: string; onClose: () => 
                 <div style={{ fontWeight: "800", fontSize: "15px", color: "var(--primary)" }}>Premium Concierge</div>
                 <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "2px" }}>Visa info + Travel guide + Health tips</div>
               </div>
-              <div style={{ fontSize: "20px", fontWeight: "800", color: "var(--accent)" }}>$49</div>
+              <div style={{ textAlign: "right" }}>
+                <span style={{ fontSize: "14px", textDecoration: "line-through", color: "rgba(0,0,0,0.3)", marginRight: "8px" }}>$99</span>
+                <div style={{ fontSize: "20px", fontWeight: "800", color: "var(--accent)" }}>$49</div>
+              </div>
             </div>
           </button>
         </div>
@@ -214,7 +223,7 @@ function ResultsContent() {
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
       <Navbar />
-      {showPaywall && <PaywallModal searchId={searchId!} onClose={() => setShowPaywall(false)} />}
+      {showPaywall && <PaywallModal searchId={searchId!} report={report} onClose={() => setShowPaywall(false)} />}
 
       <div style={{ paddingTop: "120px", paddingBottom: "100px" }}>
         <div className="container-custom">
@@ -310,19 +319,22 @@ function ResultsContent() {
                       position: "absolute", inset: 0,
                       background: "linear-gradient(to bottom, rgba(247,249,252,0) 0%, rgba(247,249,252,1) 80%)",
                       display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column",
-                      padding: "40px", textAlign: "center",
+                      padding: "40px", textAlign: "center", zIndex: 10
                     }}>
+                      <div style={{ position: "absolute", top: "100px", right: "40px", background: "#EF4444", color: "white", padding: "6px 14px", borderRadius: "8px", fontWeight: "800", fontSize: "12px", boxShadow: "0 4px 12px rgba(239,68,68,0.3)", transform: "rotate(5deg)" }}>
+                        📉 40% Lower Cost Found
+                      </div>
                       <div style={{ marginTop: "120px" }}>
                         <div style={{ width: "64px", height: "64px", background: "white", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", boxShadow: "0 10px 20px rgba(0,0,0,0.05)" }}>
                           <Lock size={24} color="var(--primary)" />
                         </div>
-                        <h3 style={{ fontSize: "22px", color: "var(--primary)", marginBottom: "12px" }}>Unlock {lockedHospitals.length} More Options</h3>
-                        <p style={{ color: "var(--text-secondary)", marginBottom: "20px", maxWidth: "340px", margin: "0 auto 20px" }}>
-                          Full hospital list, direct contact details, and complete treatment breakdowns.
+                        <h3 style={{ fontSize: "22px", color: "var(--primary)", marginBottom: "12px" }}>Stop Overpaying for Care</h3>
+                        <p style={{ color: "var(--text-secondary)", marginBottom: "20px", maxWidth: "440px", margin: "0 auto 20px" }}>
+                          Full hospital list, direct contact details, and <strong>complete treatment breakdowns for {lockedHospitals.length} more affordable options.</strong>
                         </p>
                         <div style={{ display: "inline-block", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "12px", padding: "10px 16px", marginBottom: "24px" }}>
                           <p style={{ margin: 0, fontSize: "14px", fontWeight: "700", color: "var(--accent)" }}>
-                            💰 People save an average of $31,000 using MediTrip. This report costs $19.
+                            🏷️ Hidden Savings: One of these hospitals is currently offering a $5,000 discount on {report.aiReport.procedureType}.
                           </p>
                         </div>
                         <button className="btn-primary" onClick={() => setShowPaywall(true)} style={{ padding: "16px 32px" }}>

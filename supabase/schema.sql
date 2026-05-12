@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS public.searches (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_searches_user_id ON public.searches(user_id);
-CREATE INDEX idx_searches_created_at ON public.searches(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_searches_user_id ON public.searches(user_id);
+CREATE INDEX IF NOT EXISTS idx_searches_created_at ON public.searches(created_at DESC);
 
 -- =============================================
 -- REPORTS table
@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS public.reports (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_reports_search_id ON public.reports(search_id);
-CREATE INDEX idx_reports_is_paid ON public.reports(is_paid);
+CREATE INDEX IF NOT EXISTS idx_reports_search_id ON public.reports(search_id);
+CREATE INDEX IF NOT EXISTS idx_reports_is_paid ON public.reports(is_paid);
 
 -- =============================================
 -- HOSPITALS table
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS public.hospitals (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_hospitals_report_id ON public.hospitals(report_id);
+CREATE INDEX IF NOT EXISTS idx_hospitals_report_id ON public.hospitals(report_id);
 
 -- =============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -105,24 +105,29 @@ ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.hospitals ENABLE ROW LEVEL SECURITY;
 
 -- Users: can read/update their own profile
+DROP POLICY IF EXISTS "Users can read own profile" ON public.users;
 CREATE POLICY "Users can read own profile"
   ON public.users FOR SELECT
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
 CREATE POLICY "Users can update own profile"
   ON public.users FOR UPDATE
   USING (auth.uid() = id);
 
 -- Searches: users can manage their own; anon searches allowed
+DROP POLICY IF EXISTS "Users can read own searches" ON public.searches;
 CREATE POLICY "Users can read own searches"
   ON public.searches FOR SELECT
   USING (user_id = auth.uid() OR user_id IS NULL);
 
+DROP POLICY IF EXISTS "Anyone can insert searches" ON public.searches;
 CREATE POLICY "Anyone can insert searches"
   ON public.searches FOR INSERT
   WITH CHECK (true);
 
 -- Reports: readable if search belongs to user
+DROP POLICY IF EXISTS "Reports readable by search owner" ON public.reports;
 CREATE POLICY "Reports readable by search owner"
   ON public.reports FOR SELECT
   USING (
@@ -133,15 +138,18 @@ CREATE POLICY "Reports readable by search owner"
     )
   );
 
+DROP POLICY IF EXISTS "Service can insert reports" ON public.reports;
 CREATE POLICY "Service can insert reports"
   ON public.reports FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Service can update reports" ON public.reports;
 CREATE POLICY "Service can update reports"
   ON public.reports FOR UPDATE
   USING (true);
 
 -- Hospitals: readable if report is accessible
+DROP POLICY IF EXISTS "Hospitals readable with report" ON public.hospitals;
 CREATE POLICY "Hospitals readable with report"
   ON public.hospitals FOR SELECT
   USING (
@@ -153,6 +161,7 @@ CREATE POLICY "Hospitals readable with report"
     )
   );
 
+DROP POLICY IF EXISTS "Service can insert hospitals" ON public.hospitals;
 CREATE POLICY "Service can insert hospitals"
   ON public.hospitals FOR INSERT
   WITH CHECK (true);

@@ -6,7 +6,7 @@ const TESTER_EMAILS = ["yugrathi100@gmail.com", "yugrathi28@gmail.com"];
 
 export async function POST(req: NextRequest) {
   try {
-    const { searchId, type, email, name, userId } = await req.json();
+    const { searchId, type, email, name, country, userId } = await req.json();
 
     if (!searchId || !type || !email || !userId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     payment = await dodo.payments.create({
       billing: {
-        country: "IN", // Required by Dodo billing, using IN or US as default
+        country: country || "US", 
       },
       customer: {
         email: email,

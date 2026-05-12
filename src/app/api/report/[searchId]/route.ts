@@ -36,7 +36,9 @@ export async function GET(
       .eq("report_id", reportRow.id)
       .order("id", { ascending: true });
 
-    const hospitals: Hospital[] = (hospitalRows || []).map((h) => ({
+    const isPaid = reportRow.is_paid;
+
+    let processedHospitals: Hospital[] = (hospitalRows || []).map((h) => ({
       id: h.id,
       name: h.name,
       address: h.address || "",
@@ -50,12 +52,37 @@ export async function GET(
       costEstimate: h.cost_estimate,
     }));
 
+    // 🛡️ SECURITY: Mask data if not paid
+    if (!isPaid) {
+      processedHospitals = processedHospitals.map((h, index) => {
+        if (index < 2) return h; // First 2 are free
+        return {
+          ...h,
+          name: "Premium Hospital Match (Locked)",
+          address: "Clinical coordinate protected",
+          city: "Protected Location",
+          phone: "Unlock to view contact",
+          costEstimate: "$?,???",
+          placeId: undefined,
+          rating: 4.5, // Dummy rating
+          totalRatings: 1200,
+        };
+      });
+    }
+
+    const aiReport = reportRow.ai_report_json;
+    // 🛡️ SECURITY: Remove sensitive concierge info if not paid
+    if (!isPaid) {
+      if (aiReport.visaInfo) aiReport.visaInfo = null;
+      if (aiReport.travelGuide) aiReport.travelGuide = null;
+    }
+
     const report: Report = {
       id: reportRow.id,
       searchId: reportRow.search_id,
-      aiReport: reportRow.ai_report_json,
-      hospitals,
-      isPaid: reportRow.is_paid,
+      aiReport,
+      hospitals: processedHospitals,
+      isPaid: isPaid,
       planTier: reportRow.plan_tier,
       paymentIntentId: reportRow.payment_intent_id,
       createdAt: reportRow.created_at,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle2, CreditCard, ArrowLeft, ShieldCheck, Lock, LogIn } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -11,6 +11,7 @@ const PLANS = [
     id: "one_time" as const,
     label: "Standard Report",
     price: "$19",
+    originalPrice: "$49",
     priceNum: 19,
     billing: "one-time",
     description: "Full clinical report with verified hospital matches",
@@ -28,6 +29,7 @@ const PLANS = [
     id: "subscription" as const,
     label: "Premium Report",
     price: "$49",
+    originalPrice: "$99",
     priceNum: 49,
     billing: "one-time",
     description: "Everything in Standard + Visa info, travel guide & expert tips",
@@ -54,8 +56,23 @@ function PaymentContent() {
   const [selected, setSelected] = useState<"one_time" | "subscription">(typeParam || "one_time");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [country, setCountry] = useState("US");
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
+
+  useEffect(() => {
+    if (searchId) {
+      supabase.from("searches").select("home_country").eq("id", searchId).single().then(({ data }) => {
+        if (data?.home_country) {
+          const countryMap: Record<string, string> = {
+            "United States": "US", "United Kingdom": "GB", "Canada": "CA", "Australia": "AU",
+            "India": "IN", "UAE": "AE", "Singapore": "SG", "Malaysia": "MY", "Germany": "DE", "France": "FR"
+          };
+          setCountry(countryMap[data.home_country] || "US");
+        }
+      });
+    }
+  }, [searchId, supabase]);
 
   async function handleCheckout() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -73,7 +90,7 @@ function PaymentContent() {
       const res = await fetch("/api/payment/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ searchId, type: selected, email, name, userId: user.id }),
+        body: JSON.stringify({ searchId, type: selected, email, name, country, userId: user.id }),
       });
       const data = await res.json();
       if (data.url) {
@@ -99,15 +116,13 @@ function PaymentContent() {
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
             <span className="badge badge-accent" style={{ marginBottom: "16px" }}>Secure Clinical Portal</span>
-            <h1 style={{ fontSize: "42px", color: "var(--primary)", marginBottom: "12px" }}>
-              Unlock Your Medical Report
-            </h1>
-            <p style={{ color: "var(--text-secondary)", fontSize: "18px", marginBottom: "16px" }}>
-              Choose a plan to see all hospital matches, specialists, and cost details.
+            <h3 style={{ fontSize: "22px", color: "var(--primary)", marginBottom: "12px" }}>Stop Overpaying for Care</h3>
+            <p style={{ color: "var(--text-secondary)", marginBottom: "20px", maxWidth: "440px", margin: "0 auto 20px" }}>
+              Full hospital list, direct contact details, and <strong>complete treatment breakdowns.</strong>
             </p>
             <div style={{ display: "inline-block", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "12px", padding: "12px 24px" }}>
               <p style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "var(--accent)" }}>
-                💰 People save an average of $31,000 using MediTrip. This report costs $19.
+                💰 People save an average of $31,000 using MediTrip. This report costs {selectedPlan.price}.
               </p>
             </div>
           </div>
@@ -150,6 +165,11 @@ function PaymentContent() {
                         {plan.label}
                       </span>
                       <div style={{ textAlign: "right" }}>
+                        {plan.originalPrice && (
+                          <span style={{ fontSize: "14px", textDecoration: "line-through", color: (plan.recommended && selected === plan.id) ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)", marginRight: "8px" }}>
+                            {plan.originalPrice}
+                          </span>
+                        )}
                         <span style={{ fontSize: "24px", fontWeight: "800", color: (plan.recommended && selected === plan.id) ? "var(--accent)" : "var(--accent)" }}>
                           {plan.price}
                         </span>
@@ -211,9 +231,11 @@ function PaymentContent() {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   <p style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "10px", lineHeight: "1.4" }}>
-                    🔒 We will display your full clinical findings and hospital coordinates securely in your dashboard.
+                    🔒 We will display your full clinical findings and hospital coordinates securely in your dashboard. We use this to pre-fill your secure checkout.
                   </p>
                 </div>
+
+
 
                 {/* Order Summary Table */}
                 <div style={{ background: "#F1F5F9", borderRadius: "14px", padding: "24px", marginBottom: "32px" }}>
