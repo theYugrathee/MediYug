@@ -41,7 +41,7 @@ export default function DonateModal({ onClose }: DonateModalProps) {
     <div 
       onClick={onClose}
       style={{
-        position: "fixed", inset: 0, zIndex: 1000,
+        position: "fixed", inset: 0, zIndex: 2000,
         background: "rgba(10,37,64,0.6)", backdropFilter: "blur(8px)",
         display: "flex", alignItems: "center", justifyContent: "center", padding: "16px",
         cursor: "pointer"
@@ -53,7 +53,8 @@ export default function DonateModal({ onClose }: DonateModalProps) {
         style={{ 
           maxWidth: "480px", width: "100%", padding: "32px", position: "relative",
           background: "white", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
-          cursor: "default"
+          cursor: "default",
+          maxHeight: "90vh", overflowY: "auto"
         }}
       >
         {/* Close */}

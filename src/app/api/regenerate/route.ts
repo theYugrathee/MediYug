@@ -17,22 +17,28 @@ export async function POST(req: NextRequest) {
     // Check regenerations remaining
     const { data: userData } = await supabase
       .from("users")
-      .select("regenerations_remaining, stripe_subscription_id")
+      .select("regenerations_remaining, dodo_subscription_id")
       .eq("id", user.id)
       .single();
 
-    const hasSubscription = !!userData?.stripe_subscription_id;
+    const hasSubscription = !!userData?.dodo_subscription_id;
     const regenCount = userData?.regenerations_remaining || 0;
 
-    if (!hasSubscription && regenCount <= 0) {
-      return NextResponse.json({ error: "No regenerations remaining" }, { status: 403 });
-    }
-
+    const body = await req.json();
     const { searchId, formData, parentReportId }: {
       searchId: string;
       formData: IntakeFormData;
       parentReportId: string;
-    } = await req.json();
+    } = body;
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!searchId || !uuidRegex.test(searchId)) {
+      return NextResponse.json({ error: "Invalid search reference" }, { status: 400 });
+    }
+
+    if (!hasSubscription && regenCount <= 0) {
+      return NextResponse.json({ error: "No regenerations remaining" }, { status: 403 });
+    }
 
     if (!searchId || !formData) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });

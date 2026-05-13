@@ -52,7 +52,7 @@ export default function Navbar() {
   return (
     <>
       {donateOpen && <DonateModal onClose={() => setDonateOpen(false)} />}
-      <nav className="navbar" style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)" }}>
+      <nav className="navbar" style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", zIndex: 100 }}>
         <div className="container-custom" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", width: "100%" }}>
 
           {/* Logo */}

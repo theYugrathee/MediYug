@@ -61,7 +61,7 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
   return (
     <div
       style={{
-        position: "fixed", inset: 0, zIndex: 200,
+        position: "fixed", inset: 0, zIndex: 2000,
         background: "rgba(10,37,64,0.55)", backdropFilter: "blur(10px)",
         display: "flex", alignItems: "center", justifyContent: "center", padding: "16px",
       }}
@@ -70,7 +70,8 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
       <div
         style={{
           background: "white", borderRadius: "24px", padding: "0",
-          maxWidth: "480px", width: "100%", overflow: "hidden",
+          maxWidth: "480px", width: "100%", overflowY: "auto",
+          maxHeight: "90vh",
           boxShadow: "0 32px 64px rgba(0,0,0,0.2)",
           animation: "fadeInUp 0.25s ease",
         }}

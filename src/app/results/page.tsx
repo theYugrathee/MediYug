@@ -25,7 +25,7 @@ function PaywallModal({ searchId, report, onClose }: { searchId: string; report:
   const router = useRouter();
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(10,37,64,0.4)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }} onClick={onClose}>
-      <div className="card animate-fade-in-up" style={{ maxWidth: "520px", width: "100%", padding: "48px", position: "relative", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)" }} onClick={(e) => e.stopPropagation()}>
+      <div className="card animate-fade-in-up" style={{ maxWidth: "520px", width: "100%", padding: "48px", position: "relative", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)", zIndex: 2000 }} onClick={(e) => e.stopPropagation()}>
         <button onClick={onClose} style={{ position: "absolute", top: "20px", right: "20px", background: "none", border: "none", cursor: "pointer", color: "var(--text-secondary)" }}><X size={24} /></button>
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <div style={{ width: "64px", height: "64px", background: "rgba(16,185,129,0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
@@ -178,6 +178,7 @@ function ResultsContent() {
           const data = await res.json();
           if (data.report?.isPaid) {
             setReport(data.report);
+            setShowPaywall(false);
             clearInterval(interval);
           }
         } catch (err) {
@@ -337,7 +338,7 @@ function ResultsContent() {
                             🏷️ Hidden Savings: One of these hospitals is currently offering a $5,000 discount on {report.aiReport.procedureType}.
                           </p>
                         </div>
-                        <button className="btn-primary" onClick={() => setShowPaywall(true)} style={{ padding: "16px 32px" }}>
+                        <button className="btn-primary" onClick={() => router.push(`/payment?searchId=${searchId}`)} style={{ padding: "16px 32px" }}>
                           Unlock Full Report — From $19
                         </button>
                       </div>

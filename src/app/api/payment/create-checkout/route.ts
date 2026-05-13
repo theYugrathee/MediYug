@@ -6,10 +6,14 @@ const TESTER_EMAILS = ["yugrathi100@gmail.com", "yugrathi28@gmail.com"];
 
 export async function POST(req: NextRequest) {
   try {
-    const { searchId, type, email, name, country, userId } = await req.json();
+    const body = await req.json();
+    const { searchId, type, userId } = body;
+    const email = body.email?.trim().toLowerCase();
+    const name = body.name?.trim().slice(0, 100);
+    const country = body.country?.trim().slice(0, 2);
 
     if (!searchId || !type || !email || !userId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid request parameters" }, { status: 400 });
     }
 
     const origin = req.headers.get("origin");
