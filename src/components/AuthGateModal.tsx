@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { X, Globe, Mail, Eye, EyeOff, User, ArrowRight, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
@@ -24,32 +23,65 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { toast.error(error.message); setLoading(false); return; }
-    toast.success("Welcome back!");
-    onAuthenticated();
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { 
+        toast.error(error.message); 
+        setLoading(false); 
+        return; 
+      }
+      toast.success("Welcome back!");
+      onAuthenticated();
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
   }
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: name } },
-    });
-    if (error) { toast.error(error.message); setLoading(false); return; }
-    toast.success("Account created! Generating your report...");
-    onAuthenticated();
+    
+    try {
+      if (password.length < 6) { 
+        toast.error("Password must be at least 6 characters"); 
+        setLoading(false); 
+        return; 
+      }
+
+      const { error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: { data: { full_name: name } } 
+      });
+
+      if (error) { 
+        toast.error(error.message); 
+        setLoading(false); 
+        return; 
+      }
+
+      toast.success("Account created successfully!");
+      onAuthenticated();
+    } catch (err) {
+      console.error("Signup error:", err);
+      toast.error("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
   }
 
   async function handleGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname + window.location.search)}` },
-    });
-    if (error) toast.error(error.message);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname + window.location.search)}` },
+      });
+      if (error) toast.error(error.message);
+    } catch (err) {
+      console.error("Google Auth error:", err);
+      toast.error("An error occurred with Google login.");
+    }
   }
 
   const inputStyle: React.CSSProperties = {
@@ -103,14 +135,14 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
             <Globe size={28} color="#10B981" />
           </div>
           <h2 style={{ color: "white", fontSize: "22px", fontWeight: "800", marginBottom: "8px" }}>
-            {mode === "choice" ? "Create a Free Account to Continue" : mode === "login" ? "Welcome Back" : "Create Your Account"}
+            {mode === "choice" ? "Create a Free Account" : mode === "login" ? "Welcome Back" : "Join MediTrip"}
           </h2>
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "14px", lineHeight: "1.5" }}>
             {mode === "choice"
               ? "Sign in to generate your report and save results to your dashboard"
               : mode === "login"
-              ? "Sign in to generate your clinical report"
-              : "It's free — generate your report instantly after signing up"}
+              ? "Sign in with your email and password"
+              : "It's free — join instantly to generate your report"}
           </p>
         </div>
 
@@ -120,12 +152,11 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
           {/* CHOICE MODE */}
           {mode === "choice" && (
             <>
-              {/* Value props */}
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
                 {[
                   "Free to create an account",
                   "Save all your reports to dashboard",
-                  "Edit & regenerate with your plan",
+                  "Secure clinical-grade comparison",
                 ].map((f) => (
                   <div key={f} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", color: "#334155" }}>
                     <CheckCircle2 size={16} color="#10B981" />
@@ -134,7 +165,6 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
                 ))}
               </div>
 
-              {/* Google */}
               <button
                 type="button"
                 onClick={handleGoogle}
@@ -143,7 +173,6 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
                   borderRadius: "10px", background: "white", cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
                   fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "16px",
-                  transition: "all 0.2s",
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24">
@@ -171,7 +200,7 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
                     alignItems: "center", justifyContent: "center", gap: "6px",
                   }}
                 >
-                  Sign Up Free <ArrowRight size={14} />
+                  Join Free <ArrowRight size={14} />
                 </button>
                 <button
                   onClick={() => setMode("login")}
@@ -187,25 +216,11 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
             </>
           )}
 
-          {/* LOGIN MODE */}
+          {/* LOGIN MODE (Password Input) */}
           {mode === "login" && (
             <form onSubmit={handleLogin}>
-              <button type="button" onClick={handleGoogle} style={{
-                width: "100%", padding: "12px", border: "1.5px solid #E2E8F0",
-                borderRadius: "10px", background: "white", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
-                fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "16px",
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
-                Continue with Google
-              </button>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
-                <span style={{ fontSize: "12px", color: "#94A3B8" }}>or</span>
-                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
-              </div>
-              <div style={{ marginBottom: "12px" }}>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "6px" }}>Email</label>
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "6px" }}>Email Address</label>
                 <div style={{ position: "relative" }}>
                   <Mail size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }} />
                   <input type="email" style={{ ...inputStyle, paddingLeft: "36px" }} placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -230,38 +245,24 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
               <p style={{ textAlign: "center", fontSize: "13px", color: "#64748B" }}>
                 No account?{" "}
                 <button type="button" onClick={() => setMode("signup")} style={{ background: "none", border: "none", color: "#10B981", fontWeight: "700", cursor: "pointer", fontSize: "13px" }}>
-                  Sign up free
+                  Join free
                 </button>
               </p>
             </form>
           )}
 
-          {/* SIGNUP MODE */}
+          {/* SIGNUP MODE (Email + Password Input) */}
           {mode === "signup" && (
             <form onSubmit={handleSignup}>
-              <button type="button" onClick={handleGoogle} style={{
-                width: "100%", padding: "12px", border: "1.5px solid #E2E8F0",
-                borderRadius: "10px", background: "white", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
-                fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "16px",
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
-                Continue with Google
-              </button>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
-                <span style={{ fontSize: "12px", color: "#94A3B8" }}>or</span>
-                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
-              </div>
               <div style={{ marginBottom: "10px" }}>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "6px" }}>Full Name</label>
                 <div style={{ position: "relative" }}>
                   <User size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }} />
-                  <input type="text" style={{ ...inputStyle, paddingLeft: "36px" }} placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
+                  <input type="text" style={{ ...inputStyle, paddingLeft: "36px" }} placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required />
                 </div>
               </div>
               <div style={{ marginBottom: "10px" }}>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "6px" }}>Email</label>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "6px" }}>Email Address</label>
                 <div style={{ position: "relative" }}>
                   <Mail size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }} />
                   <input type="email" style={{ ...inputStyle, paddingLeft: "36px" }} placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -281,7 +282,7 @@ export default function AuthGateModal({ onClose, onAuthenticated }: AuthGateModa
                 borderRadius: "10px", color: "white", fontWeight: "700", cursor: "pointer",
                 fontSize: "14px", opacity: loading ? 0.7 : 1, marginBottom: "12px",
               }}>
-                {loading ? "Creating account..." : "Create Account & Generate Report"}
+                {loading ? "Joining..." : "Join & Generate Report"}
               </button>
               <p style={{ textAlign: "center", fontSize: "13px", color: "#64748B" }}>
                 Already have an account?{" "}

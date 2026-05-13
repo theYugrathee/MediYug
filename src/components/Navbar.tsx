@@ -18,25 +18,26 @@ export default function Navbar() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user: u } }) => {
-      setUser(u);
-      if (u) {
-        const fetchUserData = async () => {
-          try {
-            const { data, error } = await supabase.from("users")
-              .select("dodo_subscription_id")
-              .eq("id", u.id)
-              .single();
-            if (error) {
-              console.error("Navbar data error:", error);
-            }
-          } catch (err) {
-            console.error("Navbar data error:", err);
-          }
-        };
-        fetchUserData();
+    
+    // Initial user check
+    supabase.auth.getUser()
+      .then(({ data: { user: u } }) => {
+        if (u) setUser(u);
+      })
+      .catch(err => console.error("Auth check error:", err));
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      try {
+        setUser(session?.user || null);
+      } catch (err) {
+        console.error("Auth state change error:", err);
       }
-    }).catch(err => console.error("Navbar auth error:", err));
+    });
+
+    return () => {
+      if (subscription) subscription.unsubscribe();
+    };
   }, []);
 
   async function handleSignOut() {

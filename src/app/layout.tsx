@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   robots: "index, follow",
 };
 
+import { Toaster } from "react-hot-toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +34,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col antialiased bg-[#F7F9FC]">
+        <Toaster position="top-center" />
         {children}
       </body>
     </html>
